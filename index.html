@@ -404,84 +404,106 @@
             }
         };
 
-        function updateNames() {
-			const groupSelect = document.getElementById('group');
-			const nameSelect = document.getElementById('name');
-			const group = groupSelect.value;
-			nameSelect.innerHTML = '<option value="">-- Выберите --</option>';
-			if (group) {
-				data.groups[group].sort().forEach(name => {
-					const option = document.createElement('option');
-					option.value = name;
-					option.textContent = name;
-					nameSelect.appendChild(option);
-				});
-				document.getElementById('name-selector').style.display = 'block';
-			} else {
-				document.getElementById('name-selector').style.display = 'none';
-				document.getElementById('schedule').style.display = 'none';
-			}
-		}
+        <script>
+    const data = {
+        groups: {
+            // ... (твои группы без изменений)
+        },
+        subjects: {
+            // ... (твои subjects без изменений, включая предоставленные данные для Czech Language Group 1–5)
+        }
+    };
 
-		function showSchedule() {
-			const name = document.getElementById('name').value;
-			if (!name) {
-				document.getElementById('schedule').style.display = 'none';
-				return;
-			}
-			document.getElementById('selected-name').textContent = name;
-			const content = document.getElementById('schedule-content');
-			content.innerHTML = '';
-			Object.keys(data.subjects).forEach(subjKey => {
-				const subj = data.subjects[subjKey];
-				if (subj.students.includes(name)) {
-					const div = document.createElement('div');
-					div.className = 'subject-block'; // Добавил класс для стилей
-					div.innerHTML = `<h3>${subj.name}</h3>`;
-					if (subj.schedule && subj.schedule.length > 0) {
-						const table = document.createElement('table');
-						const thead = document.createElement('thead');
-						const tr = document.createElement('tr');
-						tr.innerHTML = '<th>Время</th><th>Понедельник</th><th>Вторник</th><th>Среда</th><th>Четверг</th><th>Пятница</th>';
-						thead.appendChild(tr);
-						table.appendChild(thead);
-						const tbody = document.createElement('tbody');
-						subj.schedule.forEach(slot => {
-							const row = document.createElement('tr');
-							row.innerHTML = `<td>${slot.time}</td>`;
-							['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
-								row.innerHTML += `<td>${slot.days[day] || ''}</td>`;
-							});
-							tbody.appendChild(row);
-						});
-						table.appendChild(tbody);
-						div.appendChild(table);
-					} else if (subj.dates && subj.dates.length > 0) {
-						const ul = document.createElement('ul');
-						subj.dates
-							.sort((a, b) => {
-								const parse = str => {
-									const [datePart, timePart] = str.split(' ');
-									const [day, month, year] = datePart.split('.').map(Number);
-									const [hours, minutes] = timePart.split('-')[0].split(':').map(Number);
-									return new Date(year, month - 1, day, hours, minutes);
-								};
-								return parse(a) - parse(b);
-							})
-							.forEach(date => {
-								const li = document.createElement('li');
-								li.textContent = date;
-								ul.appendChild(li);
-							});
-						div.appendChild(ul);
-					} else {
-						div.innerHTML += '<p>Нет данных по расписанию.</p>';
-					}
-					content.appendChild(div);
-				}
-			});
-			document.getElementById('schedule').style.display = 'block';
-		}
+    function updateNames() {
+        // ... (без изменений, как было)
+    }
+
+    function showSchedule() {
+        const name = document.getElementById('name').value;
+        if (!name) {
+            document.getElementById('schedule').style.display = 'none';
+            return;
+        }
+        document.getElementById('selected-name').textContent = name;
+        const content = document.getElementById('schedule-content');
+        content.innerHTML = '';
+        Object.keys(data.subjects).forEach(subjKey => {
+            const subj = data.subjects[subjKey];
+            if (subj.students.includes(name)) {
+                const div = document.createElement('div');
+                div.className = 'subject-block';
+                div.innerHTML = `<h3>${subj.name}</h3>`;
+                if (subj.schedule && subj.schedule.length > 0) {
+                    // НОВАЯ ЛОГИКА: группировка по дням
+                    const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                    const dayNames = {
+                        Monday: 'Понедельник',
+                        Tuesday: 'Вторник',
+                        Wednesday: 'Среда',
+                        Thursday: 'Четверг',
+                        Friday: 'Пятница'
+                    };
+
+                    // Собираем уникальные дни
+                    const uniqueDays = new Set();
+                    subj.schedule.forEach(slot => {
+                        Object.keys(slot.days).forEach(day => uniqueDays.add(day));
+                    });
+
+                    // Schedule по дням
+                    const scheduleByDay = {};
+                    daysOrder.forEach(day => {
+                        if (uniqueDays.has(day)) {
+                            scheduleByDay[day] = subj.schedule
+                                .filter(slot => slot.days[day])
+                                .map(slot => ({ time: slot.time, lesson: slot.days[day] }));
+                        }
+                    });
+
+                    // Генерируем HTML по дням
+                    let scheduleHtml = '';
+                    Object.keys(scheduleByDay).forEach(day => {
+                        scheduleHtml += `<h4>${dayNames[day]}</h4><ul>`;
+                        scheduleByDay[day].forEach(item => {
+                            scheduleHtml += `<li>${item.time}: ${item.lesson}</li>`;
+                        });
+                        scheduleHtml += `</ul>`;
+                    });
+
+                    if (scheduleHtml) {
+                        div.innerHTML += scheduleHtml;
+                    } else {
+                        div.innerHTML += '<p>Нет занятий.</p>';
+                    }
+                } else if (subj.dates && subj.dates.length > 0) {
+                    // Старый код для дат (без изменений)
+                    const ul = document.createElement('ul');
+                    subj.dates
+                        .sort((a, b) => {
+                            const parse = str => {
+                                const [datePart, timePart] = str.split(' ');
+                                const [day, month, year] = datePart.split('.').map(Number);
+                                const [hours, minutes] = timePart.split('-')[0].split(':').map(Number);
+                                return new Date(year, month - 1, day, hours, minutes);
+                            };
+                            return parse(a) - parse(b);
+                        })
+                        .forEach(date => {
+                            const li = document.createElement('li');
+                            li.textContent = date;
+                            ul.appendChild(li);
+                        });
+                    div.appendChild(ul);
+                } else {
+                    div.innerHTML += '<p>Нет данных по расписанию.</p>';
+                }
+                content.appendChild(div);
+            }
+        });
+        document.getElementById('schedule').style.display = 'block';
+    }
+</script>
 </script>
 </body>
+
 </html>
