@@ -55,6 +55,10 @@ function updateNames() {
 }
 
 function showSchedule() {
+	['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach((day, index) => {
+    const dayName = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница'][index];
+    row.innerHTML += `<td data-label="${dayName}">${slot.days[day] || ''}</td>`;
+});
     const subjectKey = subjectSelect.value;
     const name = nameSelect.value;
 
@@ -129,3 +133,4 @@ function showSchedule() {
 
 subjectSelect.addEventListener('change', updateNames);
 nameSelect.addEventListener('change', showSchedule);
+
