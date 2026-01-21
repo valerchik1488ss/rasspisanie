@@ -303,11 +303,6 @@ li {
     }
 }
 
-table, thead, tbody, th, td, tr { display: block; }
-thead { display: none; }
-td { position: relative; padding-left: 48%; text-align: right; }
-td::before { content: attr(data-label); ... }
-
 
 
 
