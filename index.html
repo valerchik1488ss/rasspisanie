@@ -1,18 +1,197 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<link rel="stylesheet" href="style.css">
-
-
-
-
-
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Расписание занятий</title>
-    
-	
+    <style>
+        /* ===== BASE ===== */
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f4f7fb;
+            --card: #ffffff;
+            --text: #2c2f33;
+            --accent: #0d6efd;
+            --accent-soft: #e7f1ff;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Roboto', system-ui, -apple-system, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+            line-height: 1.65;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 32px;
+            padding: 28px 20px;
+            background: linear-gradient(135deg, #0d6efd, #0a58ca);
+            color: #fff;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(13,110,253,0.25);
+        }
+
+        header p {
+            margin-top: 8px;
+            opacity: 0.9;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            color: #0d6efd;
+            margin-bottom: 16px;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            color: #084298;
+            margin: 0 0 12px;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .field label {
+            margin-bottom: 6px;
+            font-weight: 600;
+            opacity: .85;
+        }
+
+        select {
+            width: 100%;
+            max-width: 420px;
+            padding: 14px 44px 14px 16px;
+            border-radius: 12px;
+            border: 1px solid #ced4da;
+            font-size: 1rem;
+            background-color: var(--card);
+            cursor: pointer;
+            transition: all .25s ease;
+            appearance: none;
+            background-image:
+                linear-gradient(45deg, transparent 50%, var(--accent) 50%),
+                linear-gradient(135deg, var(--accent) 50%, transparent 50%);
+            background-position:
+                calc(100% - 22px) calc(1em + 2px),
+                calc(100% - 16px) calc(1em + 2px);
+            background-size: 6px 6px;
+            background-repeat: no-repeat;
+            box-shadow: 0 4px 12px rgba(0,0,0,.08);
+        }
+
+        select:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(0,0,0,.12);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+        }
+
+        select:not([value=""]) {
+            border-left: 5px solid var(--accent);
+        }
+
+        .subject-block {
+            background-color: var(--card);
+            padding: 18px 20px;
+            margin-bottom: 22px;
+            border-radius: 14px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .subject-block:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+        }
+
+        /* Стили для нового формата расписания по дням */
+        .subject-block h4 {
+            font-size: 1.15rem;
+            color: #0d6efd;
+            margin: 20px 0 10px;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 6px;
+        }
+
+        .subject-block ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px;
+        }
+
+        .subject-block li {
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #e7f1ff, #f4f8ff);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .subject-block li strong {
+            min-width: 110px;
+            color: #084298;
+        }
+
+        /* Мобильная адаптация */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
+            header {
+                padding: 20px 16px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .controls {
+                grid-template-columns: 1fr;
+            }
+
+            select {
+                max-width: 100%;
+            }
+        }
+
+        [data-theme="dark"] {
+            --bg: #121417;
+            --card: #1e2228;
+            --text: #e9ecef;
+            --accent: #4dabf7;
+            --accent-soft: #1c2a3a;
+        }
+    </style>
 </head>
 <body>
 
@@ -22,23 +201,27 @@
     </header>
 
     <main>
-        <section id="group-selector">
-            <label for="group">Выберите группу:</label>
-            <select id="group" onchange="updateNames()">
-                <option value="">-- Выберите --</option>
-                <option value="group1">Группа 1</option>
-                <option value="group2">Группа 2</option>
-                <option value="group3">Группа 3</option>
-                <option value="group4">Группа 4</option>
-                <option value="group5">Группа 5</option>
-            </select>
+        <section id="group-selector" class="controls">
+            <div class="field">
+                <label for="group">Выберите группу:</label>
+                <select id="group" onchange="updateNames()">
+                    <option value="">-- Выберите --</option>
+                    <option value="group1">Группа 1</option>
+                    <option value="group2">Группа 2</option>
+                    <option value="group3">Группа 3</option>
+                    <option value="group4">Группа 4</option>
+                    <option value="group5">Группа 5</option>
+                </select>
+            </div>
         </section>
 
-        <section id="name-selector" style="display: none;">
-            <label for="name">Выберите имя:</label>
-            <select id="name" onchange="showSchedule()">
-                <option value="">-- Выберите --</option>
-            </select>
+        <section id="name-selector" class="controls" style="display: none;">
+            <div class="field">
+                <label for="name">Выберите имя:</label>
+                <select id="name" onchange="showSchedule()">
+                    <option value="">-- Выберите --</option>
+                </select>
+            </div>
         </section>
 
         <section id="schedule" style="display: none;">
@@ -51,251 +234,12 @@
         const data = {
             groups: {
                 group1: ["Zhykhor Viacheslav", "Melnychenko Tetiana", "Ballakh Vladyslav", "Borysenko Yehor", "Bulatov Mykyta", "Holubko Kira", "Huk Hlib", "Hustii Kristina", "Chernysh Oleh", "Iatchmenev Lin", "Kostenko Valerii", "Maslova Inna", "Muzychenko Nikita", "Pylypchuk Daria", "Shulzhenko Herman", "Zaichenko Yeva"],
-                group2: ["Datsenko Dmytro", "Hlushko Yaroslav", "Inozemtseva Daria", "Kovalchuk Tymofii", "Lazurko Leonid", "Lisitsyna Kateryna", "Maksymenko Kyryl", "Margat Abzal", "Nehoda Volodymyr", "Prishchepa Herman", "Silenko Vladyslava", "Stupak Bohdan", "Sukhanov Roman", "Tileules Meirman", "Tulegenov Yelnur", "Zaichenko Andrii",],
+                group2: ["Datsenko Dmytro", "Hlushko Yaroslav", "Inozemtseva Daria", "Kovalchuk Tymofii", "Lazurko Leonid", "Lisitsyna Kateryna", "Maksymenko Kyryl", "Margat Abzal", "Nehoda Volodymyr", "Prishchepa Herman", "Silenko Vladyslava", "Stupak Bohdan", "Sukhanov Roman", "Tileules Meirman", "Tulegenov Yelnur", "Zaichenko Andrii"],
                 group3: ["Bezhanov-Fam Kristian", "Bilak Yurii", "Hannochka Nikita", "Hatsenko Danylo", "Hrybenko Volodymyr", "Chirka Andrii", "Ihnatiev Dmytrii", "Mandzyk Lev-Yurii", "Minin Denys", "Mykhailenko Bohdan", "Orlov Yehor", "Sevruk Anastasiia", "Shyian Maksym", "Smyrnov Viktor", "Strelnikov Tymur", "Yarmulska Stefaniia", "Zaikin Oleksandr", "Zaikin Oleksii"],
                 group4: ["Andriushchenko Daryna", "Huhnin Rodion", "Kolisnichenko Illia", "Korolskyi Mykyta", "Kryvenko Yaroslav", "Kulyk Oleksii", "Luhanskyi Maksym", "Mai Vitalii", "Makarov Maksym", "Marushchak Oleksandr", "Minieiev Maksym", "Navytaniuk Nazar", "Panikhidin Oleksii", "Peretiatko Daniil", "Petryk Artem", "Tarasenko Daniil", "Torianyk Andrii", "Yurkiv Illia"],
                 group5: ["Bachynskyi Serhii", "Baranets Daniil", "Biehov Artem", "Bilyk Oleksandr", "Bondarenko Daniela", "Hudyria Denys", "Kapustianskyi Hlib", "Koryachenko Davyd", "Kozachok Yehor", "Natanov Pavlo", "Panasenko Yaroslav", "Perederii Sofia", "Petrenko Mariia", "Rezniuk Mykhailo", "Shykhalov Mykyta", "Sichkarenko Nazar", "Sinchenko Ivan", "Skubchenko Oleh"]
             },
             subjects: {
-                "English Group 1": {
-					name: "English Group 1",
-                    students: ["Kolisnichenko Illia", "Borysenko Yehor", "Bulatov Mykyta", "Huk Hlib", "Hlushko Yaroslav", "Koryachenko Davyd", "Baranets Daniil", "Andriushchenko Daryna", "Antonov Yevhenii", "Holubko Kira", "Biehov Artem", "Iatchmenev Lin", "Hustii Kristina", "Bilak Yurii", "Hannochka Nikita", "Chirka Andrii", "Hudyria Denys", "Datsenko Dmytro", "Chernysh Oleh", "Inozemtseva Daria", "Hrybenko Volodymyr", "Ballakh Vladyslav", "Bondarenko Daniela", "Kostenko Valerii"],
-                    dates: [
-								"23.01.2026 17:20-18:50",
-								"30.01.2026 17:20-18:50",
-								"06.02.2026 17:20-18:50",
-								"20.02.2026 17:20-18:50",
-								"27.02.2026 17:20-18:50",
-								"06.03.2026 17:20-18:50",
-								"13.03.2026 17:20-18:50",
-								"20.03.2026 17:20-18:50",
-								"27.03.2026 17:20-18:50",
-								"10.04.2026 17:20-18:50",
-								"17.04.2026 17:20-18:50",
-								"24.04.2026 17:20-18:50"] 
-			},
-                "English Group 2": {
-					name: "English Group 2",
-                    students: ["Muzychenko Nikita", "Pylypchuk Daria", "Melnychenko Tetiana", "Minin Denys", "Petrenko Mariia", "Panasenko Yaroslav", "Shyian Maksym", "Minieiev Maksym", "Mandzyk Lev-Yurii", "Marushchak Oleksandr", "Rezniuk Mykhailo", "Nehoda Volodymyr", "Maslova Inna", "Petryk Artem", "Prishchepa Herman", "Kozachok Yehor", "Sevruk Anastasiia", "Serb Oleksii", "Navytaniuk Nazar", "Kovalchuk Tymofii", "Lazurko Leonid", "Shulzhenko Herman", "Margat Abzal", "Shykhalov Mykyta"],
-                    dates: [
-								"23.01.2026 19:00-20:30",
-								"30.01.2026 19:00-20:30",
-								"06.02.2026 19:00-20:30",
-								"20.02.2026 19:00-20:30",
-								"27.02.2026 19:00-20:30",
-								"06.03.2026 19:00-20:30",
-								"13.03.2026 19:00-20:30",
-								"20.03.2026 19:00-20:30",
-								"27.03.2026 19:00-20:30",
-								"10.04.2026 19:00-20:30",
-								"17.04.2026 19:00-20:30",
-								"24.04.2026 19:00-20:30"
-							]
-			},
-                "English Group 3": {
-					name: "English Group 3",
-                    students: ["Sichkarenko Nazar", "Strelnikov Tymur", "Shykhalov Mykyta", "Silenko Vladyslava", "Stupak Bohdan", "Zaichenko Yeva", "Tulegenov Yelnur", "Zhykhor Viacheslav", "Torianyk Andrii", "Shyian Maksym", "Shulzhenko Herman", "Sinchenko Ivan", "Yurkiv Illia", "Sevruk Anastasiia", "Serb Oleksii", "Rezniuk Mykhailo", "Smyrnov Viktor", "Sukhanov Roman"],
-                    dates: [
-								"31.01.2026 8:30-10:00",
-								"31.01.2026 10:15-11:45",
-								"28.02.2026 8:30-10:00",
-								"28.02.2026 10:15-11:45",
-								"14.03.2026 8:30-10:00",
-								"14.03.2026 10:15-11:45",
-								"28.03.2026 8:30-10:00",
-								"28.03.2026 10:15-11:45",
-								"11.04.2026 8:30-10:00",
-								"11.04.2026 10:15-11:45",
-								"25.04.2026 8:30-10:00",
-								"25.04.2026 10:15-11:45"
-							]
-			},
-                "Matematika střední škola": {
-					name: "Matematika střední škola",
-                    students: ["Tulegenov Yelnur", "Lisitsyna Kateryna", "Mai Vitalii", "Hannochka Nikita", "Margat Abzal", "Chirka Andrii"],
-                    dates: [
-								    "19.01.2026 16:30-18:00",
-									"26.01.2026 16:30-18:00",
-									"02.02.2026 16:30-18:00",
-									"16.02.2026 16:30-18:00",
-									"23.02.2026 16:30-18:00",
-									"02.03.2026 16:30-18:00",
-									"09.03.2026 16:30-18:00",
-									"16.03.2026 16:30-18:00",
-									"23.03.2026 16:30-18:00",
-									"30.03.2026 16:30-18:00",
-									"13.04.2026 16:30-18:00",
-									"20.04.2026 16:30-18:00",
-									"27.04.2026 16:30-18:00",
-									"04.05.2026 16:30-18:00"
-							]
-			},
-                "ZSV": {
-					name: "ZSV",
-                    students: ["Datsenko Dmytro", "Petrenko Mariia", "Inozemtseva Daria", "Shulzhenko Herman", "Sevruk Anastasiia", "Huk Hlib"],
-                    dates: [
-							"25.01.2026 12:00-13:30",
-							"25.01.2026 13:45-15:15",
-							"01.02.2026 12:00-13:30",
-							"01.02.2026 13:45-15:15",
-							"08.02.2026 12:00-13:30",
-							"08.02.2026 13:45-15:15",
-							"22.02.2026 12:00-13:30",
-							"22.02.2026 13:45-15:15",
-							"01.03.2026 12:00-13:30",
-							"01.03.2026 13:45-15:15",
-							"08.03.2026 12:00-13:30",
-							"08.03.2026 13:45-15:15",
-							"15.03.2026 12:00-13:30",
-							"15.03.2026 13:45-15:15"
-							]
-			},
-                "Biologie": {
-					name: "Biologie",
-                    students: ["Sichkarenko Nazar", "Holubko Kira", "Minin Denys", "Zaichenko Yeva", "Lisitsyna Kateryna", "Kozachok Yehor", "Kostenko Valerii", "Hustii Kristina", "Ballakh Vladyslav", "Maslova Inna"],
-                    dates: [
-								"27.01.2026 17:20-18:50",
-								"03.02.2026 17:20-18:50",
-								"17.02.2026 17:20-18:50",
-								"24.02.2026 17:20-18:50",
-								"03.03.2026 17:20-18:50",
-								"10.03.2026 17:20-18:50",
-								"17.03.2026 17:20-18:50",
-								"24.03.2026 17:20-18:50",
-								"31.03.2026 17:20-18:50",
-								"07.04.2026 17:20-18:50",
-								"14.04.2026 17:20-18:50",
-								"21.04.2026 17:20-18:50",
-								"28.04.2026 17:20-18:50",
-								"05.05.2026 17:20-18:50"
-							]
-
-			},
-                "OSP-ČB": {
-					name: "OSP-ČB",
-                    students: ["Pylypchuk Daria", "Petrenko Mariia", "Peretiatko Daniil", "Huk Hlib", "Shykhalov Mykyta", "Panasenko Yaroslav", "Silenko Vladyslava", "Huhnin Rodion", "Maslova Inna", "Andriushchenko Daryna", "Biehov Artem", "Makarov Maksym", "Sevruk Anastasiia", "Serb Oleksii", "Datsenko Dmytro", "Inozemtseva Daria", "Kapustianskyi Hlib", "Lazurko Leonid", "Shulzhenko Herman", "Yurkiv Illia", "Ballakh Vladyslav", "Panikhidin Oleksii", "Bondarenko Daniela"],
-					dates: [
-							"25.01.2026 08:30-10:00",
-							"25.01.2026 10:15-11:45",
-							"01.02.2026 08:30-10:00",
-							"01.02.2026 10:15-11:45",
-							"08.02.2026 08:30-10:00",
-							"08.02.2026 10:15-11:45",
-							"22.02.2026 08:30-10:00",
-							"22.02.2026 10:15-11:45",
-							"01.03.2026 08:30-10:00",
-							"01.03.2026 10:15-11:45",
-							"08.03.2026 08:30-10:00",
-							"08.03.2026 10:15-11:45",
-							"15.03.2026 08:30-10:00",
-							"15.03.2026 10:15-11:45"
-						]
-
-								
-			},
-                "Chemie": {
-					name: "Chemie",
-                    students: ["Sichkarenko Nazar", "Holubko Kira", "Minin Denys", "Zaichenko Yeva", "Kozachok Yehor", "Kostenko Valerii", "Hustii Kristina", "latchmenev Lin", "Kryvenko Yaroslav", "Maslova Inna"],
-                    dates: [
-								"21.01.2026 17:20-18:50",
-								"28.01.2026 17:20-18:50",
-								"04.02.2026 17:20-18:50",
-								"18.02.2026 17:20-18:50",
-								"25.02.2026 17:20-18:50",
-								"04.03.2026 17:20-18:50",
-								"11.03.2026 17:20-18:50",
-								"18.03.2026 17:20-18:50",
-								"25.03.2026 17:20-18:50",
-								"01.04.2026 17:20-18:50",
-								"08.04.2026 17:20-18:50",
-								"15.04.2026 17:20-18:50",
-								"22.04.2026 17:20-18:50",	
-								"29.04.2026 17:20-18:50"
-							]
-	
-			},
-                "Fyzika": {
-					name: "Fyzika",
-                    students: ["Muzychenko Nikita", "Holubko Kira", "Melnychenko Tetiana", "Zaichenko Yeva", "Kovalchuk Tymofii", "Zhykhor Viacheslav", "Mai Vitalii", "Natytaniuk Nazar", "Kostenko Valerii", "Baranets Daniil", "Borysenko Yehor", "Hustii Kristina", "Kryvenko Yaroslav", "Zaikin Oleksandr", "Bulatov Mykyta", "Nehoda Volodymyr", "Hlushko Yaroslav"],
-                    dates: [
-								"22.01.2026 17:20-18:50",
-								"29.01.2026 17:20-18:50",
-								"05.02.2026 17:20-18:50",
-								"19.02.2026 17:20-18:50",
-								"26.02.2026 17:20-18:50",
-								"05.03.2026 17:20-18:50",
-								"12.03.2026 17:20-18:50",
-								"19.03.2026 17:20-18:50",
-								"26.03.2026 17:20-18:50",
-								"02.04.2026 17:20-18:50",
-								"09.04.2026 17:20-18:50",
-								"16.04.2026 17:20-18:50",
-								"23.04.2026 17:20-18:50",
-								"30.04.2026 17:20-18:50"
-							]
-
-			},
-                "Informatika": {
-					name: "Informatika",
-                    students: ["Hudyria Denys", "Chernysh Oleh", "Koryachenko Davyd", "Antonov Yevhenii", "Maksymenko Kyryl", "Petryk Artem", "Kolisnichenko Illia", "Shyian Maksym", "Prishchepa Herman", "Minieiev Maksym", "Hrybenko Volodymyr", "Bachynskyi Serhii", "Mandzyk Lev-Yurii", "Margat Abzal", "Marushchak Oleksandr", "Rezniuk Mykhailo", "Chirka Andrii", "Bezhanov-Fam Kristian", "Sinchenko ivan", "Strelnikov Tymur", "Stupak Bohdan", "Sukhanov Roman", "Torianyk Andrii", "Tulegenov Yelnur", "Zaikin Oleksii"],
-                    dates: [
-								"25.01.2026 10:15-11:45",
-								"01.02.2026 10:15-11:45",
-								"08.02.2026 10:15-11:45",
-								"22.02.2026 10:15-11:45",
-								"01.03.2026 10:15-11:45",
-								"08.03.2026 10:15-11:45",
-								"15.03.2026 10:15-11:45",
-								"22.03.2026 10:15-11:45",
-								"29.03.2026 10:15-11:45",
-								"12.04.2026 10:15-11:45",
-								"19.04.2026 10:15-11:45",
-								"26.04.2026 10:15-11:45"
-							]
-
-			},
-                "Matematika vysoká škola Group 1": {
-					name: "Matematika vysoká škola Group 1",
-                    students: ["Muzychenko Nikita", "Andriushchenko Daryna", "Chernysh Oleh", "Maksymenko Kyryl", "Melnychenko Tetiana", "Kolisnichenko Illia", "Kovalchuk Tymofii", "Korolskyi Mykyta", "Huhnin Rodion", "Lazurko Leonid", "Mandzyk Lev-Yurii", "Minieiev Maksym", "Borysenko Yehor", "Navytaniuk Nazar", "Bulatov Mykyta", "Marushchak Oleksandr", "Nehoda Volodymyr", "Hlushko Yaroslav", "Peretiatko Daniil", "Petryk Artem", "Prishchepa Herman", "Silenko Vladyslava", "Zaichenko Andrii", "Zhykhor Viacheslav"],
-                    dates: [
-								"19.01.2026 14:45-16:15",
-								"26.01.2026 14:45-16:15",
-								"02.02.2026 14:45-16:15",
-								"16.02.2026 14:45-16:15",
-								"23.02.2026 14:45-16:15",
-								"02.03.2026 14:45-16:15",
-								"09.03.2026 14:45-16:15",
-								"16.03.2026 14:45-16:15",
-								"23.03.2026 14:45-16:15",
-								"30.03.2026 14:45-16:15",
-								"13.04.2026 14:45-16:15",
-								"20.04.2026 14:45-16:15",
-								"27.04.2026 14:45-16:15",
-								"04.05.2026 14:45-16:15"
-							]
-
-			},
-                "Matematika vysoká škola Group 2": {
-					name: "Matematika vysoká škola Group 2",
-                    students: ["Hudyria Denys", "Strelnikov Tymur", "Koryachenko Davyd", "Panasenko Yaroslav", "Antonov Yevhenii", "Shykhalov Mykyta", "Biehov Artem", "Kapustianskyi Hlib", "Smyrnov Viktor", "Shyian Maksym", "Hrybenko Volodymyr", "Bachynskyi Serhii", "Sinchenko Ivan", "Baranets Daniil", "Bezhanov-Fam Kristian", "Serb Oleksii", "Rezniuk Mykhailo", "Bondarenko Daniela", "Stupak Bohdan", "Sukhanov Roman", "Torianyk Andrii", "Yurkiv Illia", "Zaikin Oleksandr", "Zaikin Oleksii"],
-                    dates: [
-								"27.01.2026 19:00-20:30",
-								"03.02.2026 19:00-20:30",
-								"17.02.2026 19:00-20:30",
-								"24.02.2026 19:00-20:30",
-								"03.03.2026 19:00-20:30",
-								"10.03.2026 19:00-20:30",
-								"17.03.2026 19:00-20:30",
-								"24.03.2026 19:00-20:30",
-								"31.03.2026 19:00-20:30",
-								"07.04.2026 19:00-20:30",
-								"14.04.2026 19:00-20:30",
-								"21.04.2026 19:00-20:30",
-								"28.04.2026 19:00-20:30",
-								"05.05.2026 19:00-20:30"
-							]
-
-			},
                 "Czech Language Group 1": {
                     students: ["Zhykhor Viacheslav", "Melnychenko Tetiana", "Ballakh Vladyslav", "Borysenko Yehor", "Bulatov Mykyta", "Holubko Kira", "Huk Hlib", "Hustii Kristina", "Chernysh Oleh", "Iatchmenev Lin", "Kostenko Valerii", "Maslova Inna", "Muzychenko Nikita", "Pylypchuk Daria", "Shulzhenko Herman", "Zaichenko Yeva"],
                     dates: [],
@@ -312,7 +256,7 @@
                     ]
                 },
                 "Czech Language Group 2": {
-                    students: ["Datsenko Dmytro", "Hlushko Yaroslav", "Inozemtseva Daria", "Kovalchuk Tymofii", "Lazurko Leonid", "Lisitsyna Kateryna", "Maksymenko Kyryl", "Margat Abzal", "Nehoda Volodymyr", "Prishchepa Herman", "Silenko Vladyslava", "Stupak Bohdan", "Sukhanov Roman", "Tileules Meirman", "Tulegenov Yelnur", "Zaichenko Andrii", ],
+                    students: ["Datsenko Dmytro", "Hlushko Yaroslav", "Inozemtseva Daria", "Kovalchuk Tymofii", "Lazurko Leonid", "Lisitsyna Kateryna", "Maksymenko Kyryl", "Margat Abzal", "Nehoda Volodymyr", "Prishchepa Herman", "Silenko Vladyslava", "Stupak Bohdan", "Sukhanov Roman", "Tileules Meirman", "Tulegenov Yelnur", "Zaichenko Andrii"],
                     dates: [],
                     name: "Czech Language Group 2",
                     schedule: [
@@ -365,145 +309,113 @@
                         {time: "15.40 - 17.10.", days: {Monday: "konverzace", Wednesday: "konverzace", Friday: "konverzace"}},
                         {time: "17.20 - 18.50", days: {Monday: "adaptovaná četba", Wednesday: "příprava CCE"}}
                     ]
-                },
-                "Matematika střední škola": {
-					name: "Matematika střední škola",
-                    students: ["Tulegenov Yelnur", "Lisitsyna Kateryna", "Mai Vitalii", "Hannochka Nikita", "Margat Abzal", "Chirka Andrii"],
-                    dates: ["13.04.2026 16:30-18:00", "26.01.2026 16:30-18:00", "2.03.2026 16:30-18:00", "9.03.2026 16:30-18:00", "23.03.2026 16:30-18:00", "4.05.2026 16:30-18:00", "16.03.2026 16:30-18:00", "16.02.2026 16:30-18:00", "23.02.2026 16:30-18:00", "27.04.2026 16:30-18:00", "2.02.2026 16:30-18:00", "20.04.2026 16:30-18:00", "19.01.2026 16:30-18:00", "30.03.2026 16:30-18:00"]
-                },
-                "OSP-ČB": {
-					name: "OSP-ČB",
-                    students: ["Pylypchuk Daria", "Petrenko Mariia", "Peretiatko Daniil", "Huk Hlib", "Shykhalov Mykyta", "Panasenko Yaroslav", "Silenko Vladyslava", "Huhnin Rodion", "Maslova Inna", "Andriushchenko Daryna", "Biehov Artem", "Makarov Maksym", "Sevruk Anastasiia", "Serb Oleksii", "Datsenko Dmytro", "Inozemtseva Daria", "Kapustianskyi Hlib", "Lazurko Leonid", "Shulzhenko Herman", "Yurkiv Illia", "Ballakh Vladyslav", "Panikhidin Oleksii", "Bondarenko Daniela"],
-                    dates: ["22.02.2026 10:15-11:45", "1.03.2026 10:15-11:45", "8.03.2026 8:30-10:00", "8.03.2026 10:15-11:45", "15.03.2026 8:30-10:00", "15.03.2026 10:15-11:45", "1.03.2026 8:30-10:00", "1.02.2026 8:30-10:00", "8.02.2026 8:30-10:00", "25.01.2026 10:15-11:45", "25.01.2026 8:30-10:00", "1.02.2026 10:15-11:45", "8.02.2026 10:15-11:45", "22.02.2026 8:30-10:00"]
-                },
-                "Chemie": {
-					name: "Chemie",
-                    students: ["Sichkarenko Nazar", "Holubko Kira", "Minin Denys", "Zaichenko Yeva", "Kozachok Yehor", "Kostenko Valerii", "Hustii Kristina", "latchmenev Lin", "Kryvenko Yaroslav", "Maslova Inna"],
-                    dates: ["18.03.2026 17:20-18:50", "25.03.2026 17:20-18:50", "1.04.2026 17:20-18:50", "8.04.2026 17:20-18:50", "15.04.2026 17:20-18:50", "22.04.2026 17:20-18:50", "29.04.2026 17:20-18:50", "25.02.2026 17:20-18:50", "4.03.2026 17:20-18:50", "21.01.2026 17:20-18:50", "4.02.2026 17:20-18:50", "11.03.2026 17:20-18:50", "18.02.2026 17:20-18:50", "28.01.2026 17:20-18:50"]
-                },
-                "Fyzika": {
-					name: "Fyzika",
-                    students: ["Muzychenko Nikita", "Holubko Kira", "Melnychenko Tetiana", "Zaichenko Yeva", "Kovalchuk Tymofii", "Zhykhor Viacheslav", "Mai Vitalii", "Natytaniuk Nazar", "Kostenko Valerii", "Baranets Daniil", "Borysenko Yehor", "Hustii Kristina", "Kryvenko Yaroslav", "Zaikin Oleksandr", "Bulatov Mykyta", "Nehoda Volodymyr", "Hlushko Yaroslav"],
-                    dates: ["19.03.2026 17:20-18:50", "26.03.2026 17:20-18:50", "2.04.2026 17:20-18:50", "9.04.2026 17:20-18:50", "16.04.2026 17:20-18:50", "23.04.2026 17:20-18:50", "30.04.2026 17:20-18:50", "26.02.2026 17:20-18:50", "19.02.2026 17:20-18:50", "22.01.2026 17:20-18:50", "5.03.2026 17:20-18:50", "29.01.2026 17:20-18:50", "12.03.2026 17:20-18:50", "5.02.2026 17:20-18:50"]
-                },
-                "Informatika": {
-					name: "Informatika",
-                    students: ["Hudyria Denys", "Chernysh Oleh", "Koryachenko Davyd", "Antonov Yevhenii", "Maksymenko Kyryl", "Petryk Artem", "Kolisnichenko Illia", "Shyian Maksym", "Prishchepa Herman", "Minieiev Maksym", "Hrybenko Volodymyr", "Bachynskyi Serhii", "Mandzyk Lev-Yurii", "Margat Abzal", "Marushchak Oleksandr", "Rezniuk Mykhailo", "Chirka Andrii", "Bezhanov-Fam Kristian", "Sinchenko ivan", "Strelnikov Tymur", "Stupak Bohdan", "Sukhanov Roman", "Torianyk Andrii", "Tulegenov Yelnur", "Zaikin Oleksii"],
-                    dates: ["15.03.2026 10:15-11:45", "22.03.2026 10:15-11:45", "29.03.2026 10:15-11:45", "12.04.2026 10:15-11:45", "19.04.2026 10:15-11:45", "26.04.2026 10:15-11:45", "8.03.2026 10:15-11:45", "22.02.2026 10:15-11:45", "25.01.2026 10:15-11:45", "1.03.2026 10:15-11:45", "1.02.2026 10:15-11:45", "8.02.2026 10:15-11:45"]
-                },
-                "Matematika vysoká škola Group 1": {
-					name: "Matematika vysoká škola Group 1",
-                    students: ["Muzychenko Nikita", "Andriushchenko Daryna", "Chernysh Oleh", "Maksymenko Kyryl", "Melnychenko Tetiana", "Kolisnichenko Illia", "Kovalchuk Tymofii", "Korolskyi Mykyta", "Huhnin Rodion", "Lazurko Leonid", "Mandzyk Lev-Yurii", "Minieiev Maksym", "Borysenko Yehor", "Navytaniuk Nazar", "Bulatov Mykyta", "Marushchak Oleksandr", "Nehoda Volodymyr", "Hlushko Yaroslav", "Peretiatko Daniil", "Petryk Artem", "Prishchepa Herman", "Silenko Vladyslava", "Zaichenko Andrii", "Zhykhor Viacheslav"],
-                    dates: ["23.02.2026 14:45-16:15", "16.02.2026 14:45-16:15", "9.03.2026 14:45-16:15", "2.03.2026 14:45-16:15", "26.01.2026 14:45-16:15", "19.01.2026 14:45-16:15", "2.02.2026 14:45-16:15", "16.03.2026 14:45-16:15", "23.03.2026 14:45-16:15", "30.03.2026 14:45-16:15", "13.04.2026 14:45-16:15", "20.04.2026 14:45-16:15", "27.04.2026 14:45-16:15", "4.05.2026 14:45-16:15"]
-                },
-                "Matematika vysoká škola Group 2": {
-					name: "Matematika vysoká škola Group 2",
-                    students: ["Hudyria Denys", "Strelnikov Tymur", "Koryachenko Davyd", "Panasenko Yaroslav", "Antonov Yevhenii", "Shykhalov Mykyta", "Biehov Artem", "Kapustianskyi Hlib", "Smyrnov Viktor", "Shyian Maksym", "Hrybenko Volodymyr", "Bachynskyi Serhii", "Sinchenko Ivan", "Baranets Daniil", "Bezhanov-Fam Kristian", "Serb Oleksii", "Rezniuk Mykhailo", "Bondarenko Daniela", "Stupak Bohdan", "Sukhanov Roman", "Torianyk Andrii", "Yurkiv Illia", "Zaikin Oleksandr", "Zaikin Oleksii"],
-                    dates: ["3.02.2026 19:00-20:30", "3.03.2026 19:00-20:30", "17.02.2026 19:00-20:30", "27.01.2026 19:00-20:30", "17.03.2026 19:00-20:30", "10.03.2026 19:00-20:30", "24.02.2026 19:00-20:30", "24.03.2026 19:00-20:30", "31.03.2026 19:00-20:30", "7.04.2026 19:00-20:30", "14.04.2026 19:00-20:30", "21.04.2026 19:00-20:30", "28.04.2026 19:00-20:30", "05.05.2026 19:00-20:30"]
                 }
+                // сюда можно добавить остальные предметы позже
             }
         };
 
-        <script>
-    const data = {
-        groups: {
-            // ... (твои группы без изменений)
-        },
-        subjects: {
-            // ... (твои subjects без изменений, включая предоставленные данные для Czech Language Group 1–5)
-        }
-    };
-
-    function updateNames() {
-        // ... (без изменений, как было)
-    }
-
-    function showSchedule() {
-        const name = document.getElementById('name').value;
-        if (!name) {
-            document.getElementById('schedule').style.display = 'none';
-            return;
-        }
-        document.getElementById('selected-name').textContent = name;
-        const content = document.getElementById('schedule-content');
-        content.innerHTML = '';
-        Object.keys(data.subjects).forEach(subjKey => {
-            const subj = data.subjects[subjKey];
-            if (subj.students.includes(name)) {
-                const div = document.createElement('div');
-                div.className = 'subject-block';
-                div.innerHTML = `<h3>${subj.name}</h3>`;
-                if (subj.schedule && subj.schedule.length > 0) {
-                    // НОВАЯ ЛОГИКА: группировка по дням
-                    const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-                    const dayNames = {
-                        Monday: 'Понедельник',
-                        Tuesday: 'Вторник',
-                        Wednesday: 'Среда',
-                        Thursday: 'Четверг',
-                        Friday: 'Пятница'
-                    };
-
-                    // Собираем уникальные дни
-                    const uniqueDays = new Set();
-                    subj.schedule.forEach(slot => {
-                        Object.keys(slot.days).forEach(day => uniqueDays.add(day));
-                    });
-
-                    // Schedule по дням
-                    const scheduleByDay = {};
-                    daysOrder.forEach(day => {
-                        if (uniqueDays.has(day)) {
-                            scheduleByDay[day] = subj.schedule
-                                .filter(slot => slot.days[day])
-                                .map(slot => ({ time: slot.time, lesson: slot.days[day] }));
-                        }
-                    });
-
-                    // Генерируем HTML по дням
-                    let scheduleHtml = '';
-                    Object.keys(scheduleByDay).forEach(day => {
-                        scheduleHtml += `<h4>${dayNames[day]}</h4><ul>`;
-                        scheduleByDay[day].forEach(item => {
-                            scheduleHtml += `<li>${item.time}: ${item.lesson}</li>`;
-                        });
-                        scheduleHtml += `</ul>`;
-                    });
-
-                    if (scheduleHtml) {
-                        div.innerHTML += scheduleHtml;
-                    } else {
-                        div.innerHTML += '<p>Нет занятий.</p>';
-                    }
-                } else if (subj.dates && subj.dates.length > 0) {
-                    // Старый код для дат (без изменений)
-                    const ul = document.createElement('ul');
-                    subj.dates
-                        .sort((a, b) => {
-                            const parse = str => {
-                                const [datePart, timePart] = str.split(' ');
-                                const [day, month, year] = datePart.split('.').map(Number);
-                                const [hours, minutes] = timePart.split('-')[0].split(':').map(Number);
-                                return new Date(year, month - 1, day, hours, minutes);
-                            };
-                            return parse(a) - parse(b);
-                        })
-                        .forEach(date => {
-                            const li = document.createElement('li');
-                            li.textContent = date;
-                            ul.appendChild(li);
-                        });
-                    div.appendChild(ul);
-                } else {
-                    div.innerHTML += '<p>Нет данных по расписанию.</p>';
-                }
-                content.appendChild(div);
+        function updateNames() {
+            const groupSelect = document.getElementById('group');
+            const nameSelect = document.getElementById('name');
+            const group = groupSelect.value;
+            nameSelect.innerHTML = '<option value="">-- Выберите --</option>';
+            if (group) {
+                data.groups[group].sort().forEach(name => {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    nameSelect.appendChild(option);
+                });
+                document.getElementById('name-selector').style.display = 'block';
+            } else {
+                document.getElementById('name-selector').style.display = 'none';
+                document.getElementById('schedule').style.display = 'none';
             }
-        });
-        document.getElementById('schedule').style.display = 'block';
-    }
-</script>
-</script>
-</body>
+        }
 
+        function showSchedule() {
+            const name = document.getElementById('name').value;
+            if (!name) {
+                document.getElementById('schedule').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('selected-name').textContent = name;
+            const content = document.getElementById('schedule-content');
+            content.innerHTML = '';
+
+            Object.keys(data.subjects).forEach(subjKey => {
+                const subj = data.subjects[subjKey];
+                if (subj.students.includes(name)) {
+                    const div = document.createElement('div');
+                    div.className = 'subject-block';
+                    div.innerHTML = `<h3>${subj.name}</h3>`;
+
+                    if (subj.schedule && subj.schedule.length > 0) {
+                        const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                        const dayNames = {
+                            Monday: 'Понедельник',
+                            Tuesday: 'Вторник',
+                            Wednesday: 'Среда',
+                            Thursday: 'Четверг',
+                            Friday: 'Пятница'
+                        };
+
+                        // Собираем все уникальные дни
+                        const uniqueDays = new Set();
+                        subj.schedule.forEach(slot => {
+                            Object.keys(slot.days).forEach(day => uniqueDays.add(day));
+                        });
+
+                        // Группируем по дням
+                        const scheduleByDay = {};
+                        daysOrder.forEach(day => {
+                            if (uniqueDays.has(day)) {
+                                scheduleByDay[day] = subj.schedule
+                                    .filter(slot => slot.days[day])
+                                    .map(slot => ({ time: slot.time, lesson: slot.days[day] }));
+                            }
+                        });
+
+                        // Выводим по дням
+                        let scheduleHtml = '';
+                        Object.keys(scheduleByDay).forEach(day => {
+                            scheduleHtml += `<h4>${dayNames[day]}</h4><ul>`;
+                            scheduleByDay[day].forEach(item => {
+                                scheduleHtml += `<li><strong>${item.time}</strong> ${item.lesson}</li>`;
+                            });
+                            scheduleHtml += `</ul>`;
+                        });
+
+                        div.innerHTML += scheduleHtml || '<p>Нет занятий в расписании.</p>';
+                    } else if (subj.dates && subj.dates.length > 0) {
+                        const ul = document.createElement('ul');
+                        subj.dates
+                            .sort((a, b) => {
+                                const parse = str => {
+                                    const [datePart, timePart] = str.split(' ');
+                                    const [day, month, year] = datePart.split('.').map(Number);
+                                    const [hours, minutes] = timePart.split('-')[0].split(':').map(Number);
+                                    return new Date(year, month - 1, day, hours, minutes);
+                                };
+                                return parse(a) - parse(b);
+                            })
+                            .forEach(date => {
+                                const li = document.createElement('li');
+                                li.textContent = date;
+                                ul.appendChild(li);
+                            });
+                        div.appendChild(ul);
+                    } else {
+                        div.innerHTML += '<p>Нет данных по расписанию.</p>';
+                    }
+
+                    content.appendChild(div);
+                }
+            });
+
+            document.getElementById('schedule').style.display = 'block';
+        }
+    </script>
+</body>
 </html>
